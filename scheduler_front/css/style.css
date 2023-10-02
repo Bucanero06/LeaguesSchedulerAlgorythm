@@ -1,0 +1,162 @@
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: auto;
+    padding: 0;
+}
+
+#appLayout {
+    height: 100%;
+}
+#leftCol {
+    width: 14em;
+}
+
+.claro .demoLayout .edgePanel {
+    background-color: #d0e9fc;
+}
+
+#viewsChart {
+    width: 550px;
+    height: 550px;
+}
+
+/* see youtube video at http://www.youtube.com/watch?v=MUApnJ3y-Bs */
+/* for side-by-side div creation.  found by googline 'html side-by-side div */
+#container {
+	width: 1010px;
+}
+.left {
+	width: 500px;
+	height: 800px;
+	background-color: #00d;
+	float: left;
+}
+.right {
+	width: 500px;
+	height: 800px;
+	background-color: #00d;
+	float: right;
+
+}
+/* See the folliwng d3js tutorial */
+/* http://alignedleft.com/tutorials/d3/drawing-divs/ */
+
+div.bar {
+	display: inline-block;
+	width: 20px;
+	height: 75px;
+	margin-right: 2px;
+	background-color: teal;
+}
+
+/* following are from http://bl.ocks.org/4063550 */
+/*
+.node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+.node {
+  font: 10px sans-serif;
+}
+.node text {
+  pointer-events: none;
+  font: 10px sans-serif;
+}
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5px;
+}
+*/
+.claro .numberTextBoxClass {width:4em;}
+.dijitButtonNode {
+        background-color: red;
+        border: 2px solid black;
+}
+/*
+#new_btn {
+  color: green;
+}
+*/
+#dbstatus_txt {
+  color:red;
+}
+.style_inline {
+  display:inline;
+}
+.style_none {
+  display:none;
+}
+/* http://dojofoundation.org/packages/dgrid/tutorials/grids_and_stores/ */
+.message {
+  height: 1em;
+  margin: 1em 2em;
+  padding: 1em 2em;
+}
+.hidden {
+  visibility: hidden;
+}
+.error {
+  background-color: #fcc;
+  color:  #900;
+}
+.dojoxCalendar{
+  font-size: 12px;
+  font-family:Myriad,Helvetica,Tahoma,Arial,clean,sans-serif;
+}
+.datetextbox {
+  width:50px;
+}
+/* http://dojotoolkit.org/reference-guide/1.9/dijit/layout/BorderContainer.html */
+.allonehundred {
+    width: 100%;
+    height: 100%;
+    overflow: auto
+}
+.height85 {
+    width: 100%;
+    height: 85%;
+    overflow: auto
+}
+.allauto {
+  width: auto;
+  height: auto;
+  overflow: auto
+}
+.editsched {
+  float:left;
+  margin:2px;
+}
+.generate_button {
+  float:right;
+  margin:2px;
+}
+.label_box {
+  margin:3px;
+}
+.empty_gap {
+    margin-left:50px;
+}
+.empty_smallgap {
+    margin-left:25px;
+}
+.empty_tinygap {
+    margin-left:10px;
+}
+.empty_smallgap_color {
+    margin-left:25px;
+    color:orange;
+}
+.date_input {
+  width:120px;
+  margin-right:40px;
+}
+.grid_cpane {
+  max-height:800px; width:100%;
+  height:auto;
+}

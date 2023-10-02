@@ -1,0 +1,14 @@
+@import "../static/dgrid/css/dgrid.css";
+
+.dgrid {
+    height: auto;
+}
+
+.dgrid .dgrid-scroller {
+    position: relative;
+    max-height: 500px;
+    overflow: auto;
+}
+#fieldinfogrid_id .field-start_date, #fieldinfogrid_id .field-end_date {
+    /*width: 10em; */
+}
