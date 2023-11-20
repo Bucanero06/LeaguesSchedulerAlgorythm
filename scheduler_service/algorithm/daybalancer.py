@@ -35,7 +35,8 @@ class DayBalancer(object):
 
     def initialize_targets(self, divinfo, div_field_days):
         total_div_games = divinfo['totalgamedays'] * divinfo['totalteams'] / 2
-        if 'primary_days' in divinfo:
+        # if 'primary_days' in divinfo:
+        if divinfo.get('primary_days'):
             primary_days = divinfo['primary_days']
             if 'secondary_days' in divinfo and divinfo['secondary_days']:
                 secondary_days = divinfo['secondary_days']

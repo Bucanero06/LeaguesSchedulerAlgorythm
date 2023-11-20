@@ -59,8 +59,8 @@ class FieldDBInterface(BaseDBInterface):
                 fieldinfo['secondaryuse_list'] = [int(x)
                     for x in fieldinfo['se'].split(',')]
                 del fieldinfo['se']
-            else:
-                fieldinfo['secondaryuse_list'] = []
+            # else:
+            #     fieldinfo['secondaryuse_list'] = []
             fieldinfo['tfd'] = self.calc_totalfielddays(fieldinfo['start_date'], fieldinfo['end_date'],
                                                         fieldinfo['dayweek_list'])
             fieldinfo['calendarmap_list'] = getcalendarmap_list(fieldinfo['dayweek_list'],
@@ -78,6 +78,7 @@ class FieldDBInterface(BaseDBInterface):
 
     def readDBraw(self):
         fdbtuple = super(FieldDBInterface, self).readDBraw()
+        print(f'{fdbtuple = }')
         for fieldinfo in fdbtuple.list:
             fieldinfo['start_time'] = parse_time_wee_hour_adjust(fieldinfo['start_time'])
             fieldinfo['end_time'] = parse_time_wee_hour_adjust(fieldinfo['end_time'])

@@ -1,6 +1,8 @@
 ''' Copyright Carbonyl LLC 2023 and YukonTR 2014 '''
 from datetime import datetime, timedelta
 from itertools import chain, groupby
+
+from scheduler_service.db import dbinterface
 from scheduler_service.util.schedule_util import roundrobin, enum, shift_list, \
     getConnectedDivisionGroup, all_isless, find_ge, find_le
 # ref Python Nutshell p.314 parsing strings to return datetime obj
@@ -14,11 +16,11 @@ from scheduler_service.util.sched_exceptions import FieldAvailabilityError, Time
 from math import ceil, floor
 from collections import namedtuple, deque, Counter
 import networkx as nx
-from timebalancer import TimeBalancer
-from fieldbalancer import FieldBalancer
-from conflictprocess import ConflictProcess
-from teampreference import process_tmprefdays
-from daybalancer import DayBalancer
+from scheduler_service.algorithm.timebalancer import TimeBalancer
+from scheduler_service.algorithm.fieldbalancer import FieldBalancer
+from scheduler_service.algorithm.conflictprocess import ConflictProcess
+from scheduler_service.algorithm.teampreference import process_tmprefdays
+from scheduler_service.algorithm.daybalancer import DayBalancer
 import pdb
 
 home_CONST = 'HOME'
@@ -1367,7 +1369,7 @@ class FieldTimeScheduleGenerator:
                 game_start_dt += gameinterval
             sstatus_len = len(sstatus_list)
             slotstatus_list = []
-            for fieldday_id in range(1, totalfielddays + 1):
+            for fieldday_id in range(1, int(totalfielddays) + 1):
                 calendarmap = calendarmap_list[calendarmap_indexerGet(fieldday_id)]
                 game_date = calendarmap['date']
                 slotstatus_dict = {'fieldday_id': fieldday_id, 'game_date': game_date}
@@ -1695,3 +1697,32 @@ class FieldTimeScheduleGenerator:
                         else:
                             sched_list[index]['sched_list'].append(match_dict)
         return _List_Indexer(sched_list, indexerGet)
+
+if __name__ == '__main__':
+    TESTUSER = "testuser"
+    TESTCOL = "TESTCOL"
+    TESTDIV_list = [{"tourndiv_id": 1, "div_age": "U8", "div_gen": "B", "totalteams": 23,
+                     "totalgamedays": 2,
+                     "gameinterval": 30, "mingap_time": 90, "elimination_type": "S", "thirdplace_enable": "Y"},
+                    {"tourndiv_id": 2, "div_age": "U8", "div_gen": "G", "totalteams": 14,
+                     "totalgamedays": 2,
+                     "gameinterval": 30, "mingap_time": 90, "elimination_type": "D", "thirdplace_enable": "Y"}]
+    tdindexerGet = lambda x: dict((p['tourndiv_id'], i) for i, p in enumerate(TESTDIV_list)).get(x)
+    TESTFIELD_list = [{"pr": "1,2", "end_date": "6/12/2015", "tfd": 28,
+                       "start_time": "8:00:00 AM",
+                       "field_id": 1, "detaileddates": "", "end_time": "5:00:00 PM", "field_name": "p1",
+                       "dr": "0,6", "start_date": "3/14/2015"},
+                      {"pr": "1,2", "end_date": "6/12/2015", "tfd": 28, "start_time": "8:00:00 AM",
+                       "field_id": 2, "detaileddates": "", "end_time": "5:00:00 PM", "field_name": "p2",
+                       "dr": "0,6", "start_date": "3/14/2015"}]
+
+    master = FieldTimeScheduleGenerator(
+        # (self, dbinterface, divinfo_tuple, fieldinfo_tuple,
+        #                  prefinfo_triple=None, pdbinterface=None, tminfo_tuple=None,
+        #                  conflictinfo_list=None, cdbinterface=None, tmprefdays_tuple=None)
+        dbinterface=dbinterface,
+        divinfo_tuple=_List_Indexer(TESTDIV_list, tdindexerGet),
+        fieldinfo_tuple=_List_Indexer(TESTFIELD_list, lambda x: dict((p['field_id'], i) for i, p in enumerate(TESTFIELD_list)).get(x)),
+
+
+    )

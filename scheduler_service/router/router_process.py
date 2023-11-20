@@ -38,11 +38,11 @@ class RouteLogic:
     '''
 
     def __init__(self):
-        self.dbinterface_map_list = list();
+        self.dbinterface_map_list = list()
         self.dbindexerMatch = lambda x, y, z: [i for i, p in enumerate(
             self.dbinterface_map_list) if p['userid_name'] == x and p['db_type'] == y
                                                and p['sched_cat'] == z]
-        self.schedmaster_map_list = list();
+        self.schedmaster_map_list = list()
         self.sindexerMatch = lambda x, y: [i for i, p in
                                            enumerate(self.schedmaster_map_list) if p['userid_name'] == x and
                                            p['sched_cat'] == y]
@@ -60,7 +60,7 @@ http://bottlepy.org/docs/dev/tutorial.html#request-routing
 
 
 # create new db collection based on new schedule parameters (currently for tournament format)
-@router.get('/create_newdbcol/{userid_name}/{db_type}/{newcol_name}/{sched_cat}')
+@router.get('/create_newdbcol')
 def create_newdbcol(request: Request, userid_name, db_type, newcol_name, sched_cat):
     callback_name = request.query_params.get("callback")
     info_data = request.query_params.get("info_data")
@@ -90,7 +90,7 @@ def create_newdbcol(request: Request, userid_name, db_type, newcol_name, sched_c
 
 
 # @route('/update_dbcol/<userid_name>/<db_type>/<col_name>/<sched_cat>')
-@router.post('/update_dbcol/{userid_name}/{db_type}/{col_name}/{sched_cat}')
+@router.post('/update_dbcol')
 def update_dbcol(request: Request, userid_name, db_type, col_name, sched_cat):
     callback_name = request.query_params.get("callback")
     update_data_str = request.query_params.get("update_data")
@@ -101,7 +101,7 @@ def update_dbcol(request: Request, userid_name, db_type, col_name, sched_cat):
 
 
 # @route('/delete_dbcol/<userid_name>/<db_type>/<delcol_name>/<sched_cat>')
-@router.delete('/delete_dbcol/{userid_name}/{db_type}/{delcol_name}/{sched_cat}')
+@router.delete('/delete_dbcol')
 def delete_dbcol(request: Request, userid_name, db_type, delcol_name, sched_cat):
     callback_name = request.query_params.get("callback")
     dbInterface = select_db_interface(userid_name, db_type, delcol_name,
@@ -112,7 +112,7 @@ def delete_dbcol(request: Request, userid_name, db_type, delcol_name, sched_cat)
 
 
 # @route('/get_dbcol/<userid_name>/<db_type>/<getcol_name>/<sched_cat>')
-@router.get('/get_dbcol/{userid_name}/{db_type}/{getcol_name}/{sched_cat}')
+@router.get('/get_dbcol')
 def get_dbcol(request: Request, userid_name, db_type, getcol_name, sched_cat):
     callback_name = request.query_params.get("callback")
     dbInterface = select_db_interface(userid_name, db_type, getcol_name,
@@ -159,8 +159,9 @@ def get_dbcol(request: Request, userid_name, db_type, getcol_name, sched_cat):
 
 
 # @route('/send_generate/<userid_name>/<sched_cat>')
-@router.post('/send_generate/{userid_name}/{sched_cat}')
-def send_generate(request: Request, userid_name: str, sched_cat: str):
+@router.post('/send_generate')
+# def send_generate(request: Request, userid_name: str, sched_cat: str):
+def send_generate(userid_name: str, sched_cat: str, request: Request):
     callback_name = request.query_params.get("callback")
     db_type = request.query_params.get("db_type")
     divcol_name = request.query_params.get("divcol_name")
@@ -229,7 +230,7 @@ def send_generate(request: Request, userid_name: str, sched_cat: str):
 
 
 # @route('/send_delta/<userid_name>/<col_name>/<action_type>/<field_id:int>/<sched_cat>')
-@router.post('/send_delta/{userid_name}/{col_name}/{action_type}/{field_id:int}/{sched_cat}')
+@router.post('/send_delta')
 def send_delta(request: Request, userid_name, col_name, action_type, field_id, sched_cat):
     callback_name = request.query_params.get("callback")
     dbindex_list = _routelogic_obj.dbindexerMatch(userid_name, 'fielddb', sched_cat)
@@ -254,7 +255,7 @@ def send_delta(request: Request, userid_name, col_name, action_type, field_id, s
 
 
 # @route('/get_schedule/<userid_name>/<schedcol_name>/<idproperty>/<propid:int>/<sched_cat>')
-@router.get('/get_schedule/{userid_name}/{schedcol_name}/{idproperty}/{propid:int}/{sched_cat}')
+@router.get('/get_schedule')
 def get_schedule(request: Request, userid_name, schedcol_name, idproperty, propid, sched_cat):
     callback_name = request.query_params.get("callback")
     # schedMaster = _routelogic_obj.schedmaster_map.get(userid_name)
@@ -299,8 +300,7 @@ def get_schedule(request: Request, userid_name, schedcol_name, idproperty, propi
     return f"{callback_name}({a})"
 
 
-# @route('/get_teamtable/<userid_name>/<schedcol_name>/<div_age>/<div_gen>/<team_id:int>/<sched_cat>')
-@router.get('/get_teamtable/{userid_name}/{schedcol_name}/{div_age}/{div_gen}/{team_id:int}/{sched_cat}')
+@router.get('/get_teamtable')
 def get_teamtable(request: Request, userid_name, schedcol_name, div_age, div_gen, team_id, sched_cat):
     callback_name = request.query_params.get("callback")
     # schedMaster = _routelogic_obj.schedmaster_map.get(userid_name)
@@ -337,7 +337,7 @@ def get_teamtable(request: Request, userid_name, schedcol_name, div_age, div_gen
 
 
 # @route('/get_xls/<userid_name>/<schedcol_name>/<db_type>/<genxls_id>/<sched_cat>')
-@router.get('/get_xls/{userid_name}/{schedcol_name}/{db_type}/{genxls_id}/{sched_cat}')
+@router.get('/get_xls')
 def get_xls(request: Request, userid_name, schedcol_name, db_type, genxls_id, sched_cat):
     callback_name = request.query_params.get("callback")
     # schedMaster = _routelogic_obj.schedmaster_map.get(userid_name)
@@ -403,7 +403,7 @@ def get_hostserver(request: Request):
 
 
 # @route('/check_user/<userid_name>')
-@router.get('/check_user/<userid_name>')
+@router.get('/check_user')
 def check_user(request: Request, userid_name):
     callback_name = request.query_params.get("callback")
     dbInterface = UserDBInterface(mongoClient)
@@ -414,8 +414,7 @@ def check_user(request: Request, userid_name):
     return f"{callback_name}({a})"
 
 
-# @route('/create_user/<userid_name>')
-@router.get('/create_user/<userid_name>')
+@router.get('/create_user')
 def create_user(request: Request, userid_name):
     callback_name = request.query_params.get("callback")
     dbInterface = UserDBInterface(mongoClient)
@@ -426,7 +425,7 @@ def create_user(request: Request, userid_name):
 
 
 # @route('/get_dbcollection/<userid_name>')
-@router.get('/get_dbcollection/<userid_name>')
+@router.get('/get_dbcollection')
 def get_dbcollection(request: Request, userid_name):
     callback_name = request.query_params.get("callback")
     rrdbcol_list = generic_dbInterface.getScheduleCollection(
@@ -484,5 +483,4 @@ def select_db_interface(userid_name, db_type, colname, sched_cat):
         dbInterface = ConflictDBInterface(mongoClient, userid_name, colname, sched_cat)
     else:
         raise CodeLogicError("leaguedivprocess:select_db_interface: db_type not recognized db_type=%s" % (db_type,))
-        dbInterface = None
     return dbInterface

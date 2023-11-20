@@ -17,6 +17,27 @@ from pika.compat import basestring
 
 _List_Indexer = namedtuple('List_Indexer', 'dict_list indexerGet')
 
+# def roundrobin(iterable_list):
+#     '''ref http://docs.python.org/2/library/itertools.html
+#     # ref http://stackoverflow.com/questions/3678869/pythonic-way-to-combine-two-lists-in-an-alternating-fashion
+#     # modified to assume argument is list of lists (instead of comma separated lists)
+#     "roundrobin('ABC', 'D', 'EF') --> A D E B F C"
+#     # Recipe credited to George Sakkis '''
+#     pending = len(iterable_list)
+#
+#     nexts = cycle(iter(it).next for it in iterable_list)
+#     while pending:
+#         try:
+#             for next in nexts:
+#                 yield next()
+#         except StopIteration:
+#             pending -= 1
+#             nexts = cycle(islice(nexts, pending))
+#
+
+from itertools import cycle, islice
+
+
 def roundrobin(iterable_list):
     '''ref http://docs.python.org/2/library/itertools.html
     # ref http://stackoverflow.com/questions/3678869/pythonic-way-to-combine-two-lists-in-an-alternating-fashion
@@ -24,7 +45,9 @@ def roundrobin(iterable_list):
     "roundrobin('ABC', 'D', 'EF') --> A D E B F C"
     # Recipe credited to George Sakkis '''
     pending = len(iterable_list)
-    nexts = cycle(iter(it).next for it in iterable_list)
+
+    nexts = cycle(iter(it).__next__ for it in iterable_list)  # Use __next__ for Python 3
+
     while pending:
         try:
             for next in nexts:
@@ -267,8 +290,8 @@ def getcalendarmap_list(dayweek_list, start_date_str, totalfielddays):
     #calculation for the first element should be
     #first_gap  = first_elem +7 - last_elem
     #           = first_elem - (last_elem - 7)
-    gap_list = [];
-    prev_elem = dayweek_list[dayweek_len-1]-7;
+    gap_list = []
+    prev_elem = dayweek_list[dayweek_len-1]-7
     for dayweek in dayweek_list:
         gap_list.append(timedelta(dayweek-prev_elem))
         prev_elem = dayweek
@@ -276,12 +299,12 @@ def getcalendarmap_list(dayweek_list, start_date_str, totalfielddays):
     #generate list that maps fieldday_id (represented as position in list) to
     #calendar date string
     mapdate_list = []
-    for fieldday_id in range(1, totalfielddays+1):
+    for fieldday_id in range(1, int(totalfielddays)+1):
         mapdate_list.append({'fieldday_id':fieldday_id, 'date':next_date})
         #get the next index into the gap list
         #if index is length of list, then roll over to 0
         next_index = (next_index+1) % dayweek_len
-        next_date += gap_list[next_index];
+        next_date += gap_list[next_index]
     return mapdate_list
 
 def parse_time_wee_hour_adjust(time_str):

@@ -7,12 +7,16 @@ from pymongo import MongoClient
 from scheduler_service.db.dbinterface import MongoDBInterface
 from time import asctime
 
+print(f'{socket.gethostname() = }')
+# if socket.gethostname() == 'web380.production.com':
+#     mongoClient = MongoClient('localhost', 11466)
+#     hostserver = "production"
+# else:
+#     mongoClient = MongoClient('localhost', 27017)
+#     hostserver = "local"
+#
+mongoClient = MongoClient('localhost', 27017)
+hostserver = "local"
 
-if socket.gethostname() == 'web380.production.com':
-    mongoClient = MongoClient('localhost', 11466)
-    hostserver = "production"
-else:
-    mongoClient = MongoClient('localhost', 27017)
-    hostserver = "local"
 generic_dbInterface = MongoDBInterface(mongoClient)
 creation_time = asctime()

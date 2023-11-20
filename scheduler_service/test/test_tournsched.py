@@ -106,11 +106,13 @@ def test_tournfieldwriteread(datadbinterface):
     fielddbinterface = datadbinterface.field
     testfield_len = len(TESTFIELD_list[0])
     testfield_str = json.dumps(TESTFIELD_list)
-    fielddbinterface.writeDB(testfield_str, 1)
+    fielddbinterface.writeDB(testfield_str, 1, divstr_colname=None,divstr_db_type=None)
     read_dict = fielddbinterface.readDB().list[0]
     #pprint(read_dict)
     # length of db read dict is one longer as fielddaymap field is calculated
     # and stored
+    print(f'{read_dict = }')
+    print(f'{TESTFIELD_list[0] = }')
     assert len(read_dict)==testfield_len+1
 
 def test_elimtourngenerate():

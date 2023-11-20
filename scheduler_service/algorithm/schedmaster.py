@@ -1,4 +1,5 @@
 ''' Copyright Carbonyl LLC 2023 and YukonTR 2014 '''
+from scheduler_service.algorithm.fieldtimescheduler import FieldTimeScheduleGenerator
 from scheduler_service.algorithm.matchgenerator import MatchGenerator
 from scheduler_service.db.tourndbinterface import TournDBInterface
 from scheduler_service.db.fielddbinterface import FieldDBInterface
@@ -12,7 +13,6 @@ from collections import namedtuple
 from dateutil import parser
 import logging
 from scheduler_service.util.sched_exceptions import CodeLogicError, FieldAvailabilityError
-
 from scheduler_service.external.message import RabbitInterface
 
 _List_Indexer = namedtuple('List_Indexer', 'dict_list indexerGet')
@@ -26,7 +26,7 @@ GENERATE_ERROR_MASK = 0x8
 # main class for launching schedule generator
 # Handling round-robin season-long schedules.  May extend to handle other schedule
 # generators.
-class SchedMaster(object):
+class SchedMaster:
     def __init__(self, mongoClient, userid_name, db_type, divcol_name,
         fieldcol_name, schedcol_name, prefcol_name=None,
         conflictcol_name=None):
@@ -44,7 +44,10 @@ class SchedMaster(object):
                 "L")
         else:
             raise CodeLogicError("schemaster:init: db_type not recognized db_type=%s" % (db_type,))
+        print(f'{dbInterface = }')
         dbtuple = dbInterface.readDBraw()
+        print(f'{dbtuple  = }')
+        print(f'{dbtuple.config_status  = }')
         if dbtuple.config_status == 1:
             self.oddnumplay_mode = dbtuple.oddnum_mode
             self.divinfo_list = dbtuple.list
@@ -59,7 +62,7 @@ class SchedMaster(object):
         # get field information
         fdbInterface = FieldDBInterface(mongoClient, userid_name, fieldcol_name,
             "L")
-        fdbtuple = fdbInterface.readDBraw();
+        fdbtuple = fdbInterface.readDBraw()
         if fdbtuple.config_status == 1:
             self.fieldinfo_list = fdbtuple.list
             self.fieldinfo_indexerGet = lambda x: dict((p['field_id'],i) for i,p in enumerate(self.fieldinfo_list)).get(x)
@@ -171,8 +174,8 @@ class SchedMaster(object):
                 games_per_team = totalgamedays
             else:
                 games_per_team = totalgamedays if (totalteams * totalgamedays) % 2 == 0 else totalgamedays - 1
-            match = MatchGenerator(totalteams, totalgamedays,
-                oddnumplay_mode=self.oddnumplay_mode, games_per_team=games_per_team)
+            match = MatchGenerator(totalteams, totalgamedays, oddnumplay_mode=self.oddnumplay_mode,
+                                   games_per_team=games_per_team)
             match_list = match.generateMatchList()
             args_obj = {'div_id':div_id, 'match_list':match_list,
                 'numgames_perteam_list':match.numgames_perteam_list,
@@ -328,3 +331,5 @@ class SchedMaster(object):
             return tminfo_tuple
         else:
             return None
+
+

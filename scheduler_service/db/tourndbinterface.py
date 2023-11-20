@@ -19,7 +19,7 @@ class TournDBInterface(BaseDBInterface):
         BaseDBInterface.__init__(self, mongoClient, userid_name, newcol_name,
             sched_cat, DB_Col_Type.TournRR, IDPROPERTY)
 
-    def writeDB(self, divinfo_str, config_status):
+    def writeDB(self, divinfo_str, config_status, **kwargs):
         divinfo_list = json.loads(divinfo_str)
         # convert keys to uppercase
         document_list = [{k.upper():v for k,v in x.items()} for x in divinfo_list]

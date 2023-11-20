@@ -1,9 +1,9 @@
 ''' Copyright Carbonyl LLC 2023 and YukonTR 2014 '''
 from scheduler_service.algorithm.matchgenerator import MatchGenerator
+from scheduler_service.algorithm.tournfieldtimescheduler import TournamentFieldTimeScheduleGenerator
 from scheduler_service.db.tourndbinterface import TournDBInterface
 from scheduler_service.db.fielddbinterface import FieldDBInterface
 from scheduler_service.db.scheddbinterface import SchedDBInterface
-
 
 from collections import namedtuple
 from dateutil import parser
@@ -159,8 +159,7 @@ class TournSchedMaster(object):
                 # MatchGenerator object.  Value is equal to #games if #teams is even,
                 # if odd, add one to #games.
                 vgames_num = totalgamedays if bracket_size%2==0 else totalgamedays+1
-                match = MatchGenerator(bracket_size, vgames_num,
-                    games_per_team=totalgamedays)
+                match = MatchGenerator(bracket_size, vgames_num, games_per_team=totalgamedays)
                 bracket_match_list = match.generateMatchList(
                     teamid_map=team_id_list)
                 match_list.append(bracket_match_list)
@@ -202,7 +201,7 @@ class TournSchedMaster(object):
                     cindexerGet = None
                 else:
                     roundteams_num = maxpower2/pow(2, round_id-1)
-                    seed_id_list = range(1, roundteams_num+1)
+                    seed_id_list = range(1, int(roundteams_num)+1)
                     # rm_list is from previous round, make sure to call this before
                     # rmatch_dict in this round
                     rm_list = rmatch_dict['match_list']
@@ -235,7 +234,7 @@ class TournSchedMaster(object):
                         'next_w_id':'W'+str(match_id_count+x+1),
                         'next_l_id':'L'+str(match_id_count+x+1),
                         'match_id':match_id_count+x+1,
-                        'comment':"", 'round':btype + str(round_id)} for x in range(numgames)
+                        'comment':"", 'round':btype + str(round_id)} for x in range(int(numgames))
                     ]
                 }
                 logging.debug("elimsched:gen: div %d round %d",
@@ -304,6 +303,22 @@ class TournSchedMaster(object):
         else:
             return None
 
+    # def generate_lseed_list(self, round_id, seed_list):
+    #     # create seeding list for losing bracket
+    #     # reverse order of incoming seeding list such that returned list can also
+    #     # be accessed starting index 0 (instead of index -1)
+    #     slen = len(seed_list)
+    #     if slen % 2:
+    #         raise CodeLogicError("elimsched:genlseed: seed list should be even")
+    #     ls_list = seed_list[::-1]
+    #     if round_id % 2 == 0:
+    #         # if round is an even number, then swap adjacent positions -
+    #         # index 0,1 <-> index 1,0; index 2,3 <->index 3,2, etc
+    #         index = 0
+    #         while index < slen:
+    #             ls_list[index], ls_list[index+1] = ls_list[index+1], ls_list[index]
+    #             index += 2
+    #     return ls_list
     def generate_lseed_list(self, round_id, seed_list):
         # create seeding list for losing bracket
         # reverse order of incoming seeding list such that returned list can also
@@ -311,14 +326,19 @@ class TournSchedMaster(object):
         slen = len(seed_list)
         if slen % 2:
             raise CodeLogicError("elimsched:genlseed: seed list should be even")
-        ls_list = seed_list[::-1]
+
+        # Convert the seed_list to a list to make it mutable
+        ls_list = list(seed_list[::-1])
+
         if round_id % 2 == 0:
             # if round is an even number, then swap adjacent positions -
             # index 0,1 <-> index 1,0; index 2,3 <->index 3,2, etc
             index = 0
             while index < slen:
-                ls_list[index], ls_list[index+1] = ls_list[index+1], ls_list[index]
-                index += 2
+                ls_list[index], ls_list[index + 1] = ls_list[index + 1], ls_list[index]
+                index += 2  # Move to the next pair
+
+        # ls_list now contains the modified seeding list
         return ls_list
 
     def createConsolationRound(self, div_id, match_list, wr_total, match_id_count,
@@ -476,7 +496,7 @@ class TournSchedMaster(object):
                 'next_w_id':'W'+str(match_id_count+x+1),
                 'next_l_id':'L'+str(match_id_count+x+1),
                 'match_id':match_id_count+x+1,
-                'comment':"", 'round':btype + str(cround_id)} for x in range(numgames)]}
+                'comment':"", 'round':btype + str(cround_id)} for x in range(int(numgames))]}
             logging.debug("elimsched:createConsole&&&&&&&&&&&&&&&&")
             logging.debug("elimsched:createConsole: Consolation div %d round %d",
                           div_id, cround_id)

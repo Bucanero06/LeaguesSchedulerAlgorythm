@@ -34,3 +34,7 @@ Utilized python libraries/tools/frameworks:
 
 ##### [Users Guide](https://github.com/Bucanero06/CarbonylWebsite/blob/3a35d79928c0a26e5fe50b62778bc2017ecc1cc0/projects_copy/SportsLaunchPadProgram/ScheduleStudy/UserGuide.md)
 
+Entry pt is schedstart.py.  
+schedmaster.py implements entry point for schedule generation.  
+matchgenerator.py implements time/place independent match generation
+fieldtimescheduler.py implementing time/venue assignments.

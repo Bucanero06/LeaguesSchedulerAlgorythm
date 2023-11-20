@@ -13,15 +13,15 @@ GAME_TEAM = 'game_team'
 large_CONST = 1e7
 
 class MatchGenerator(object):
-    def __init__(self, nt, ng, oddnumplay_mode=0, games_per_team=10000):
-        self.numTeams = nt
-        self.num_rounds = ng  # num gameslots per team per season
+    def __init__(self, number_of_teams, num_rounds, oddnumplay_mode=0, games_per_team=10000):
+        self.numTeams = number_of_teams
+        self.num_rounds = num_rounds  # num gameslots per team per season
         self.games_per_team = games_per_team
-        if (nt*games_per_team % 2 == 1):
+        if (number_of_teams*games_per_team % 2 == 1):
             logging.warning("MatchGenerator: some team will need a bye!")
         # actual number of games per team (determined by counter), init to 0 to start
         # position in list is team_id-1
-        self._numgames_perteam_list = nt*[0]
+        self._numgames_perteam_list = number_of_teams * [0]
         self.bye_flag = False
         self._byeteam_list = None
         self.oddnumplay_mode = oddnumplay_mode
@@ -46,7 +46,7 @@ class MatchGenerator(object):
         self.timeslots_per_day = 0
         # metrics_list is array of counter dictionaries.
         # position in array corresponds to team_id-1 (since team_id is one-index based)
-        self.metrics_list = nt*[0]
+        self.metrics_list = number_of_teams * [0]
         self.match_by_round_list = []
         self.targethome_count_list = []
         self.matchG = nx.DiGraph()
@@ -72,7 +72,12 @@ class MatchGenerator(object):
                 # remove only relevant attrib entry
                 gamecount_id_list.remove(gamecount_id)
                 # re-insert attribute list (based on original home away team id's)
-                self.matchG.edge[source_id][sink_id]['gamecount_id'] = gamecount_id_list
+                print(f'{source_id = }')
+                print(f'{sink_id = }')
+                print(f'{gamecount_id_list = }')
+                # self.matchG.edges[source_id][sink_id]['gamecount_id'] = gamecount_id_list
+                self.matchG.add_edge(source_id, sink_id, gamecount_id=gamecount_id_list)
+
             return True
         else:
             return False
@@ -86,8 +91,10 @@ class MatchGenerator(object):
             self.matchG[source_id][sink_id]['gamecount_id'].append(gamecount_id)
 
     def getBalancedHomeAwayTeams(self, team1_id, team2_id, gamecount_id):
-        # assign home away teams based on current home game counters for the two teams
-        # team id's are 1-indexed so decrement to get 0-index-based list position
+        """
+        assign home away teams based on current home game counters for the two teams
+        team id's are 1-indexed so decrement to get 0-index-based list position
+        """
         t1_ind = team1_id - 1
         t2_ind = team2_id - 1
         # update game number (per team) counter
@@ -111,17 +118,20 @@ class MatchGenerator(object):
             self._numgames_perteam_list[t2_ind] -= 1
             return None
 
-    # calculate cost function - euclidean distance between metrics_list and
-    # targethome_count_list (if targethome_count is a list itself, then distance is defined
-    # as the minimum distance to that list (closest element)
-    # prototype for calculating list of absoute value differences (before calculating sqrt of sum sq)
-    # list1 = []
-    # for (a1,b1) in zip(a,b):
-    #    list2 = []
-    #    for b2 in b1:
-    #	    list2.append(abs(a1-b2) if a1 not in b1 else 0)
-    #    list1.append(min(list2))
+
     def computeCostFunction(self, metrics_list):
+        """
+        calculate cost function - euclidean distance between metrics_list and
+        targethome_count_list (if targethome_count is a list itself, then distance is defined
+        as the minimum distance to that list (closest element)
+        prototype for calculating list of absoute value differences (before calculating sqrt of sum sq)
+        list1 = []
+        for (a1,b1) in zip(a,b):
+           list2 = []
+           for b2 in b1:
+        	    list2.append(abs(a1-b2) if a1 not in b1 else 0)
+           list1.append(min(list2))
+        """
         absdiff_list = [min([abs(m-t2) if m not in t else 0 for t2 in t]) for (m,t) in zip(metrics_list, self.targethome_count_list)]
         euclidean_norm = sqrt(sum([x*x for x in absdiff_list]))
         return euclidean_norm
@@ -161,9 +171,9 @@ class MatchGenerator(object):
                 print('home away SWAPPED', min_team_id, max_team_id)
                 print('new metrics list', self.metrics_list)
                 print('targethome',self.targethome_count_list)
-                #print('matchG edge list attributes AFTER swap',nx.get_edge_attributes(self.matchG,'gamecount_id')
+                # print('matchG edge list attributes AFTER swap',nx.get_edge_attributes(self.matchG,'gamecount_id'))
                 foundFlag = True
-                break;
+                break
         else:
             gamecount_id_attrib = nx.get_edge_attributes(self.matchG,'gamecount_id')
             current_cost = self.computeCostFunction(self.metrics_list)
@@ -356,7 +366,7 @@ class MatchGenerator(object):
             else:
                 if self.oddnumplay_mode > 0:
                     self._byeteam_list.append({'round_id':game_count, 'byeteam':circletop_team})
-            for j in range(1, self.half_n):
+            for j in range(1, int(self.half_n)):
                 # we need to loop for the n value (called half_n)
                 # which is half of effective number of teams (which includes bye team if
                 # there is one)
@@ -416,3 +426,19 @@ class MatchGenerator(object):
             game_list = round_matches[GAME_TEAM]
             for game in game_list:
                 game.update((k,teamid_map[v-1]) for k,v in game.iteritems())
+
+
+if __name__ == '__main__':
+    # season
+    # 8 teams
+    # 1 games per week
+    # 7 weeks per season
+    # #playoff
+    # 2 rounds of playoffs
+    # 1 round of championship
+
+    match_generator = MatchGenerator(
+        8, 1, oddnumplay_mode=0, games_per_team=7)
+    generated_match_list = match_generator.generateMatchList()
+    print(generated_match_list)
+
